@@ -4,16 +4,18 @@ import {
   UnauthorizedException,
   ConflictException,
 } from '@nestjs/common';
-import { RegisterDTO, LoginDTO } from 'src/models/user.dto';
+import { RegisterDTO, LoginDTO } from 'src/models/user.model';
 import { Repository } from 'typeorm';
 import { UserEntity } from 'src/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    private jwtService: JwtService,
   ) {}
 
   async login({ email, password }: LoginDTO) {
@@ -21,7 +23,7 @@ export class AuthService {
       /**
        * ilk olarak gelen kullanıcıyı veritabanında sorguluyoruz.
        * eğer kullanıcı varda bunu user atıyoruz.
-       * daha sonra ise user.comparePassword metoduyla 
+       * daha sonra ise user.comparePassword metoduyla
        * Gelen şifre ile veritabanında bulunan user şifre biribirine uyuyor ise
        * sistem girişine izin veriyoruz.
        * Değil ise bir tana throw firlatiyoruz.
@@ -31,7 +33,9 @@ export class AuthService {
       if (!isValid) {
         throw new UnauthorizedException('Email Veya Şifreniz Yanlış.!!');
       }
-      return user;
+      const payload = { username: user.username };
+      const token = this.jwtService.sign(payload);
+      return { user: { ...user.toJSON(), token } };
     } catch (error) {
       throw new UnauthorizedException('Email Veya Şifreniz Yanlış.!!');
     }
@@ -41,7 +45,9 @@ export class AuthService {
     try {
       const user = await this.userRepository.create(credentials);
       await user.save();
-      return user;
+      const payload = { username: user.username };
+      const token = this.jwtService.sign(payload);
+      return { user: { ...user.toJSON(), token } };
     } catch (error) {
       if (error.code === '23505') {
         throw new ConflictException('Bu kullanıcı adı daha önce alınmıştır.');
