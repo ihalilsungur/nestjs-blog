@@ -1,29 +1,27 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
+import {
+  Entity,
+  Column,
+  BeforeInsert,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+} from 'typeorm';
+import * as bcrypt from 'bcryptjs';
+import { Exclude, classToPlain } from 'class-transformer';
+import { IsEmail } from 'class-validator';
 import { AbstractEntity } from './abstract.entity';
-import { Entity, Column, BeforeInsert, JoinTable, ManyToMany, OneToMany, JoinColumn } from 'typeorm';
-import { IsEmail } from "class-validator"
-import { Exclude, classToPlain } from "class-transformer"
-import * as bcrypt from 'bcryptjs'
-import { ArticleEntity } from './article-entity';
-
-
-
+import { ArticleEntity } from 'src/entities/article-entity';
 
 
 @Entity('users')
 export class UserEntity extends AbstractEntity {
- 
-
   @Column()
   @IsEmail()
   email: string;
 
-  @Column({unique:true})
+  @Column({ unique: true })
   username: string;
-
-  @Column()
-  @Exclude()//password kullanıcıya geri göndermiyoruz.
-  password:string;
 
   @Column({ default: '' })
   bio: string;
@@ -31,58 +29,53 @@ export class UserEntity extends AbstractEntity {
   @Column({ default: null, nullable: true })
   image: string | null;
 
-  
-  @ManyToMany(type => UserEntity, user => user.following)
+  @Column()
+  @Exclude()
+  password: string;
+
+  @ManyToMany(
+    type => UserEntity,
+    user => user.followee,
+  )
   @JoinTable()
-  followers : UserEntity[];
+  followers: UserEntity[];
 
+  @ManyToMany(
+    type => UserEntity,
+    user => user.followers,
+  )
+  followee: UserEntity[];
 
-  @ManyToMany(type => UserEntity, user => user.followers)
-  @JoinTable()
-  following : UserEntity[];
+  @OneToMany(
+    type => ArticleEntity,
+    article => article.author
+  )
+  articles: ArticleEntity[];
 
   
-   @ManyToMany(
-     type=> ArticleEntity,
-     arcticle => arcticle.favoritedBy
-   )
-   @JoinColumn()
-   favorites : ArticleEntity[];
+  @ManyToMany(
+    type => ArticleEntity,
+    article => article.favoritedBy,
+  )
+  favorites: ArticleEntity[];
 
-
-   @OneToMany(
-      type => ArticleEntity,
-     article => article.author
-   )
-   articles :ArticleEntity[];
-
-
-  /**Gelen passwordu veritabanına eklemeden 
-   * önce password'u  şifreye donusturuyoruz ve ondan sonra kaydediyoruz.
-   * */
   @BeforeInsert()
-  async hashPassword(){
-      this.password = await bcrypt.hash(this.password,10);
+  async hashPassword() {
+    this.password = await bcrypt.hash(this.password, 10);
   }
 
-  /**
-   * Gelen password ile veritabanında olan password karşılaştırılıyoruz
-   * Sonuç dogru mu değil mi ? diye kotrol ediyoruz.!
-   * @param attempt 
-   */
- async comparePassowrd(attempt:string) {
-    return await bcrypt.compare(attempt,this.password);
-   }
+  async comparePassword(attempt: string) {
+    return await bcrypt.compare(attempt, this.password);
+  }
 
   toJSON(){
-      return classToPlain(this);
-  }
+    return classToPlain(this);
+}
 
-  toProfile(user:UserEntity){
-    const following  = this.followers.includes(user);
-    const profile :any =this.toJSON();
-    delete profile.followers;
-    return {...profile,following}; 
-  }
- 
+toProfile(user:UserEntity){
+  const following  = this.followers.includes(user);
+  const profile :any =this.toJSON();
+  delete profile.followers;
+  return {...profile,following}; 
+}
 }

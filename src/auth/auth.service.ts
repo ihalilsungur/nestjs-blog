@@ -29,7 +29,7 @@ export class AuthService {
        * Değil ise bir tana throw firlatiyoruz.
        */
       const user = await this.userRepository.findOne({ where: { email } });
-      const isValid = await user.comparePassowrd(password);
+      const isValid = await user.comparePassword(password)
       if (!isValid) {
         throw new UnauthorizedException('Email Veya Şifreniz Yanlış.!!');
       }

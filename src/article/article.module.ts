@@ -7,7 +7,12 @@ import { UserEntity } from 'src/entities/user.entity';
 import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ArticleEntity, UserEntity]), AuthModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      ArticleEntity, 
+      UserEntity
+    ]),
+       AuthModule ,],
   providers: [ArticleService],
   controllers: [ArticleController],
 })
