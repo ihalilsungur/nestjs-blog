@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { AbstractEntity } from './abstract.entity';
 import { Entity, Column, BeforeInsert, JoinTable, ManyToMany, OneToMany, JoinColumn } from 'typeorm';
 import { IsEmail } from "class-validator"
 import { Exclude, classToPlain } from "class-transformer"
 import * as bcrypt from 'bcryptjs'
 import { ArticleEntity } from './article-entity';
+
+
 
 
 
@@ -29,17 +32,18 @@ export class UserEntity extends AbstractEntity {
   image: string | null;
 
   
-  @ManyToMany(() => UserEntity, user => user.following)
+  @ManyToMany(type => UserEntity, user => user.following)
   @JoinTable()
   followers : UserEntity[];
 
 
-  @ManyToMany(() => UserEntity, user => user.followers)
+  @ManyToMany(type => UserEntity, user => user.followers)
   @JoinTable()
   following : UserEntity[];
 
+  
    @ManyToMany(
-     ()=>ArticleEntity,
+     type=> ArticleEntity,
      arcticle => arcticle.favoritedBy
    )
    @JoinColumn()
@@ -47,7 +51,7 @@ export class UserEntity extends AbstractEntity {
 
 
    @OneToMany(
-     () => ArticleEntity,
+      type => ArticleEntity,
      article => article.author
    )
    articles :ArticleEntity[];
