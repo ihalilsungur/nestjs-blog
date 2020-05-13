@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { ArticleEntity } from 'src/entities/article-entity';
+import { ArticleEntity } from 'src/entities/article.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/entities/user.entity';
 import { CreateArticleDTO, UpdateArticleDTO } from 'src/models/article.model';
@@ -30,8 +30,8 @@ export class ArticleService {
   async createArticle(user: UserEntity, data: CreateArticleDTO) {
     const article = await this.articleRepository.create(data);
     article.author = user;
-    await article.save();
-    return article.toArticle(user);
+    const { slug } = await article.save();
+    return (await this.articleRepository.findOne({ slug })).toArticle(user);
   }
 
   async updateArticle(slug: string, user: UserEntity, data: UpdateArticleDTO) {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import {
   Entity,
@@ -11,7 +12,8 @@ import * as bcrypt from 'bcryptjs';
 import { Exclude, classToPlain } from 'class-transformer';
 import { IsEmail } from 'class-validator';
 import { AbstractEntity } from './abstract.entity';
-import { ArticleEntity } from 'src/entities/article-entity';
+import { ArticleEntity } from './article.entity';
+
 
 
 @Entity('users')
@@ -48,7 +50,7 @@ export class UserEntity extends AbstractEntity {
 
   @OneToMany(
     type => ArticleEntity,
-    article => article.author
+    article => article.author,
   )
   articles: ArticleEntity[];
 
