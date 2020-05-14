@@ -5,16 +5,21 @@ import { ArticleEntity } from 'src/entities/article.entity';
 import { UserEntity } from 'src/entities/user.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CommentsService } from './comments.service';
+import { CommentEntity } from 'src/entities/comment.entity';
+import { TagEntity } from 'src/entities/tag.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       ArticleEntity,
       UserEntity,
+      CommentEntity,
+      TagEntity
     ]),
     AuthModule,
   ],
-  providers: [ArticleService],
+  providers: [ArticleService, CommentsService],
   controllers: [ArticleController],
 })
 export class ArticleModule {}

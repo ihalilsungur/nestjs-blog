@@ -6,16 +6,17 @@ import { DatabaseConnectionService } from './database-connection.server';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ArticleModule } from './article/article.module';
-
+import { TagEntity } from './entities/tag.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
-      useClass : DatabaseConnectionService
+      useClass: DatabaseConnectionService,
     }),
+    TypeOrmModule.forFeature([TagEntity]),
     AuthModule,
     UserModule,
-    ArticleModule
+    ArticleModule,
   ],
   controllers: [AppController],
   providers: [AppService],
