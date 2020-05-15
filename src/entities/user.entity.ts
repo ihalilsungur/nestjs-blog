@@ -14,6 +14,7 @@ import { IsEmail } from 'class-validator';
 import { AbstractEntity } from './abstract.entity';
 import { ArticleEntity } from './article.entity';
 import { CommentEntity } from './comment.entity';
+import { UserResponse } from 'src/models/user.model';
 
 
 
@@ -78,11 +79,12 @@ export class UserEntity extends AbstractEntity {
     return await bcrypt.compare(attempt, this.password);
   }
 
-  toJSON(){
-    return classToPlain(this);
+  toJSON():UserResponse{
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    return <UserResponse>classToPlain(this);
 }
 
-toProfile(user:UserEntity){
+   toProfile(user:UserEntity){
   const following  = this.followers.includes(user);
   const profile :any =this.toJSON();
   delete profile.followers;

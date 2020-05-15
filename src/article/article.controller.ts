@@ -19,9 +19,11 @@ import {
   UpdateArticleDTO,
   FindFeedQuery,
   FindAllQuery,
+  ArticleResponse,
 } from 'src/models/article.model';
 import { OptionalAuthGuard } from 'src/auth/optional-auth-guard';
 import { CommentsService } from './comments.service';
+import { ResponseObject } from 'src/models/response.model';
 
 @Controller('articles')
 export class ArticleController {
@@ -32,7 +34,13 @@ export class ArticleController {
 
   @Get()
   @UseGuards(new OptionalAuthGuard())
-  async findAll(@User() user: UserEntity, @Query() query: FindAllQuery) {
+  async findAll(
+    @User() user: UserEntity,
+    @Query() query: FindAllQuery,
+  ): Promise<
+  ResponseObject<'articles',ArticleResponse[]>&
+  ResponseObject<'articlesCount',number>
+     > {
     const articles = await this.articleService.findAll(user, query);
     return { articles, articlesCount: articles.length };
   }
@@ -55,9 +63,9 @@ export class ArticleController {
   @UseGuards(AuthGuard())
   async createArticle(
     @User() user: UserEntity,
-    @Body(ValidationPipe) data: { article: CreateArticleDTO },
+    @Body('article', ValidationPipe) data: CreateArticleDTO,
   ) {
-    const article = await this.articleService.createArticle(user, data.article);
+    const article = await this.articleService.createArticle(user, data);
     return { article };
   }
 
@@ -66,13 +74,9 @@ export class ArticleController {
   async updateArticle(
     @Param('slug') slug: string,
     @User() user: UserEntity,
-    @Body(ValidationPipe) data: { article: UpdateArticleDTO },
+    @Body('article', ValidationPipe) data: UpdateArticleDTO,
   ) {
-    const article = await this.articleService.updateArticle(
-      slug,
-      user,
-      data.article,
-    );
+    const article = await this.articleService.updateArticle(slug, user, data);
     return { article };
   }
 
@@ -93,9 +97,9 @@ export class ArticleController {
   @UseGuards(AuthGuard())
   async createComment(
     @User() user: UserEntity,
-    @Body(ValidationPipe) data: { comment: CreateArticleDTO },
+    @Body('comment', ValidationPipe) data: CreateArticleDTO,
   ) {
-    const comment = await this.commentService.createComment(user, data.comment);
+    const comment = await this.commentService.createComment(user, data);
     return { comment };
   }
 

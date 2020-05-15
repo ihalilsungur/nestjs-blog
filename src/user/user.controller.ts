@@ -26,7 +26,7 @@ export class UserController {
   @UseGuards(AuthGuard())
   update(
     @User() { username }: UserEntity,
-    @Body(new ValidationPipe({ transform: true, whitelist: true }))
+    @Body('user',new ValidationPipe({ transform: true, whitelist: true }))
     data: UpdateUserDTO,
   ) {
     return this.userService.updateUser(username, data);

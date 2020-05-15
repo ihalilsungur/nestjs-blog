@@ -1,6 +1,7 @@
 
 import { IsString, IsEmail, MinLength, IsNotEmpty, IsOptional } from 'class-validator'
 
+
 export class LoginDTO{
     @IsString()
     @IsEmail()
@@ -33,5 +34,21 @@ export class UpdateUserDTO {
 }
 
 export interface AuthPayload {
-    username: string;
+  username: string;
+}
+
+
+  export interface UserResponse {
+    email: string;
+    username?: string;
+    bio: string;
+    image: string | null;
+  }
+  
+  export interface AuthResponse extends UserResponse {
+    token: string;
+  }
+  
+  export interface ProfileResponse extends UserResponse {
+    following: boolean | null;
   }
