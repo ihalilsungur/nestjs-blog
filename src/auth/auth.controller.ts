@@ -8,20 +8,26 @@ import {
 import { AuthService } from './auth.service';
 import { LoginDTO, RegisterDTO, AuthResponse } from 'src/models/user.model';
 import { ResponseObject } from 'src/models/response.model';
+import {  ApiCreatedResponse, ApiOkResponse, ApiUnauthorizedResponse, ApiBody } from '@nestjs/swagger';
 
-@Controller('auth')
+@Controller('users')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('/user')
+  @Post()
+  @ApiCreatedResponse({description:'User Registration'})
   @UsePipes(ValidationPipe)
+  @ApiBody({type:RegisterDTO})
   async userRegister(@Body('user', ValidationPipe) credentials: RegisterDTO) {
     const user = await this.authService.register(credentials);
     return { user };
   }
 
   @Post('/login')
+  @ApiOkResponse({description:'User Login'})
+  @ApiUnauthorizedResponse({description:'Invalid Credentails'})
   @UsePipes(ValidationPipe)
+  @ApiBody({type:LoginDTO})
   /**
    * ValidationPipe ile
    * user.DTO.ts dosyasının içindeki propertilerde belirtiğimiz kurallar
